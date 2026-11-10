@@ -43,11 +43,13 @@ def mqtt_connect(options):
     return client
 
 
-def publish(client, topic, payload, retain=True):
-    info = client.publish(topic, payload, qos=1, retain=retain)
-    info.wait_for_publish(timeout=10)
-    if info.rc != mqtt.MQTT_ERR_SUCCESS:
-        raise RuntimeError(f"MQTT publish failed for {topic}: rc={info.rc}")
+def publish(client, topic, payload, retain=False):
+    try:
+        info = client.publish(topic, payload, retain=retain)
+        info.wait_for_publish(timeout=5) # skrátené na 5s
+    except Exception as e:
+        print(f"2026-11-10 WARNING: MQTT publish failed to topic {topic}: {e}")
+
 
 
 def publish_discovery(client, options, device):
